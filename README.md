@@ -2,4 +2,7 @@
 Classic word game
 
 Language: Java
-for simple version; points and one round only
+
+To fix: Losing 
+
+To add: Multiple rounds
