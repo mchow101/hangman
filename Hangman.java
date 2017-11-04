@@ -1,18 +1,11 @@
-//Hangman without JFrame
-
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 import java.util.Scanner;
 
 @SuppressWarnings("serial")
-public class Hangman extends JPanel implements KeyListener, Runnable {
+public class Hangman extends JPanel implements Runnable {
 	Thread t;
 	JFrame frame = new JFrame("Hangman");
-	boolean game = true;
-	char letter;
-	String word = "hello";
-	String wordg = "";
 	int line = -1;
 	int[][] hangman = {
 			{175, 250, 150, 150},
@@ -22,6 +15,10 @@ public class Hangman extends JPanel implements KeyListener, Runnable {
 			{250, 600, 200, 650},
 			{250, 600, 300, 650}
 	};
+	boolean gameOn = true;
+	String str = "";
+	public static Word w = new Word();
+	
 	public Hangman() {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(800, 800);
@@ -30,25 +27,12 @@ public class Hangman extends JPanel implements KeyListener, Runnable {
 		frame.repaint();
 		t = new Thread(this);
 		t.start();
-		for(int i = 0; i < word.length(); i++)
-	         wordg += "-";
 	}
-
+	
 	public void run() {
-		while(true) {
-			//do all math or checking stuff here
+		while(gameOn) {
 			frame.repaint();
 		}
-	}
-
-	public void keyPressed(KeyEvent e) {
-	}
-
-	public void keyReleased(KeyEvent e) {
-	}
-
-	public void keyTyped(KeyEvent e) {
-		letter = (char) e.getKeyChar();
 	}
 	
 	public void drawALine(boolean b) {
@@ -56,22 +40,8 @@ public class Hangman extends JPanel implements KeyListener, Runnable {
 			line++;
 	}
 	
-	public boolean check(String s) {
-		String fakeInput = s;
-        char input = fakeInput.charAt(0);
-        boolean test = false;
-        for(int i = 0; i < word.length(); i++) {
-            if(input == word.charAt(i)) {
-            	test = true;
-            	char[] theWord = wordg.toCharArray();
-                theWord[i] = input;
-                wordg = String.valueOf(theWord);
-            }
-        }
-        if(test == false)
-        	return true;
-        else
-        	return false;
+	public void createWord(String s) {
+		w.setWord(s);
 	}
 	
 	public void paintComponent(Graphics g) {
@@ -80,14 +50,13 @@ public class Hangman extends JPanel implements KeyListener, Runnable {
 		g.fillRect(0, 0, 800, 800);
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("Times New Roman", Font.PLAIN, 50));
-		g.drawString("Welcome to Hangman!", 150, 75);
+		String txt = "Welcome to Hangman!";
 		g.drawLine(100, 700, 100, 150);
 		g.drawLine(50, 700, 150, 700);
 		g.drawLine(100, 150, 250, 150);
 		g.drawLine(250, 150, 250, 250);
-		if(game == true) {
+		if(gameOn == true) {
 			g.setFont(new Font("Times New Roman", Font.PLAIN, 70));
-			g.drawString(wordg, 450, 400);
 			if(line < 6) {
 				for(int i = 0; i <= line; i++) {
 					if(i != 0)
@@ -96,19 +65,29 @@ public class Hangman extends JPanel implements KeyListener, Runnable {
 						g.drawOval(hangman[i][0], hangman[i][1], hangman[i][2], hangman[i][3]);
 				}
 			}
-			else {
-				game = false;
+			
+			if(w.win()) {
+				txt = "You win!";
 				line = -1;
 			}
+			if (line >= 6) {
+				txt = "You lose!";
+				line = -1;
+			}
+			g.drawString(txt, 150, 75);
+			g.drawString(w.print(), 450, 400);
+			frame.repaint();
 		}
 	}
-	
+
 	public static void main(String[]args) {
 		Hangman man = new Hangman();
+		man.createWord("hello");
+		@SuppressWarnings("resource")
 		Scanner scan = new Scanner(System.in);
 		boolean b = true;
-		while(b == true) {
-			man.drawALine(man.check(scan.nextLine()));
+		while(b) {
+			man.drawALine(w.check(scan.nextLine()));
 		}
 	}
 }
