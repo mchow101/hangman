@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.io.*;
+
 import javax.swing.*;
 import java.util.Scanner;
 
@@ -38,6 +40,27 @@ public class Hangman extends JPanel implements Runnable {
 	public void drawALine(boolean b) {
 		if(b == true) 
 			line++;
+	}
+	
+	public String chooseWord() {
+		File file = new File("D:/MyPrograms/Eclipse Workspace/Hangman/src/wordList.txt");
+		StringBuffer stringBuffer = new StringBuffer();
+		String line = "";
+		try {
+			FileReader fileReader = new FileReader(file);
+			BufferedReader bufferedReader = new BufferedReader(fileReader);
+			int count = 0;
+			int choice = (int)(Math.random()*100) + 1;
+			while (count <= choice) {
+				count++;
+				line = bufferedReader.readLine();
+			}
+			stringBuffer.append(line);
+			fileReader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return stringBuffer.toString();
 	}
 	
 	public void createWord(String s) {
@@ -82,7 +105,7 @@ public class Hangman extends JPanel implements Runnable {
 
 	public static void main(String[]args) {
 		Hangman man = new Hangman();
-		man.createWord("hello");
+		man.createWord(man.chooseWord());
 		@SuppressWarnings("resource")
 		Scanner scan = new Scanner(System.in);
 		boolean b = true;
